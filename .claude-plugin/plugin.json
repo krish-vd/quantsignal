@@ -19,6 +19,7 @@
     "./agents/quantsignal.md"
   ],
   "skills": [
+    "./skills/quantsignal.md",
     "./skills/signal-run.md",
     "./skills/signal-quick.md"
   ]

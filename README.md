@@ -38,6 +38,22 @@ The agent **never fabricates backtest statistics** and **always cites
 sources**. When you want real numbers, it hands off to the `signal-run`
 skill, which actually fetches data and computes results.
 
+### Slash commands
+
+Once the plugin is loaded, three commands are available:
+
+| Command | What it does |
+|---|---|
+| `/quantsignal [hypothesis]` | Runs the full 5-step research pipeline above on a plain-English idea. |
+| `/signal-run [factor + universe + dates]` | Runs a real quintile-sort backtest (IC, IR, Sharpe, max drawdown, plot) using `src/`. |
+| `/signal-quick [factor + tickers]` | Computes a factor's current value for a few tickers, no backtest. |
+
+Example:
+
+```
+/quantsignal companies that just announced large stock buybacks tend to outperform
+```
+
 ---
 
 ## Project structure
