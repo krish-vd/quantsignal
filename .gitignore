@@ -15,3 +15,6 @@ venv/
 # IDE
 .vscode/
 .idea/
+
+# Local Claude Code settings (machine-specific permissions)
+.claude/settings.local.json
