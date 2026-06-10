@@ -1,0 +1,25 @@
+{
+  "name": "quantsignal",
+  "version": "0.1.0",
+  "description": "QuantSignal: an LLM-powered alpha factor research agent. Turns a plain-English market hypothesis into a formalized factor, classifies it, evaluates its economic rationale, checks crowding/novelty against academic literature, scores it on a five-dimension scorecard, and (optionally) backtests it with a quintile-sort engine.",
+  "author": {
+    "name": "QuantSignal Contributors"
+  },
+  "homepage": "https://github.com/quantsignal/quantsignal",
+  "license": "MIT",
+  "keywords": [
+    "quant",
+    "finance",
+    "alpha-factor",
+    "research",
+    "backtesting",
+    "factor-investing"
+  ],
+  "agents": [
+    "./agents/quantsignal.md"
+  ],
+  "skills": [
+    "./skills/signal-run.md",
+    "./skills/signal-quick.md"
+  ]
+}
