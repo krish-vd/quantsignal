@@ -528,6 +528,114 @@ def plot_quintile_returns(
     return fig
 
 
+def plot_factor_summary(
+    result: BacktestResult,
+    factor_name: str,
+    subtitle: Optional[str] = None,
+    save_path: Optional[str] = None,
+):
+    """Plot a two-panel summary chart: cumulative returns + per-period IC.
+
+    This is the "report-ready" chart for a factor backtest:
+
+    - **Top panel**: cumulative growth of $1 for the bottom quintile ("Q1 -
+      Lowest <factor_name> (losers)", red), the top quintile ("Q5 - Highest
+      <factor_name> (winners)", green), and the long-short spread ("Q5 - Q1
+      long-short spread", blue). A title and optional subtitle (e.g.,
+      describing the universe and rebalance frequency) are shown above the
+      chart, and a one-line stats summary (IC mean, IR, Sharpe, Max DD) is
+      shown below it.
+    - **Bottom panel**: a bar chart of the Information Coefficient at each
+      rebalance date, colored green where IC > 0 (factor ranked correctly
+      that period) and red where IC < 0 (factor ranked backwards that
+      period). This makes it easy to see at a glance how *consistent* the
+      factor's predictive power was over time, complementing the single
+      IR number.
+
+    Args:
+        result: A `BacktestResult` from `run_quintile_backtest`.
+        factor_name: Human-readable factor name, used in the legend labels
+            and chart title (e.g., "12-1 Month Momentum").
+        subtitle: Optional second line of the title describing the universe
+            and rebalance frequency (e.g., "15-stock mega-cap universe,
+            monthly rebalance").
+        save_path: If provided, save the figure to this file path (e.g.,
+            "factor_summary.png").
+
+    Returns:
+        The matplotlib `Figure` object.
+
+    Raises:
+        ImportError: If matplotlib is not installed.
+        KeyError: If `result.cumulative_returns` does not contain at least
+            two quintile columns plus "Q5_minus_Q1".
+    """
+    if not _HAS_MATPLOTLIB:
+        raise ImportError(
+            "matplotlib is required for plot_factor_summary(). Install it "
+            "with `pip install matplotlib`."
+        )
+
+    cum = result.cumulative_returns
+    quintile_cols = [c for c in cum.columns if c.startswith("Q") and "_" not in c]
+    if len(quintile_cols) < 2 or "Q5_minus_Q1" not in cum.columns:
+        raise KeyError(
+            "result.cumulative_returns must contain at least two quintile "
+            "columns (e.g., 'Q1', 'Q5') and a 'Q5_minus_Q1' spread column."
+        )
+
+    bottom_q, top_q = quintile_cols[0], quintile_cols[-1]
+
+    years = f"{cum.index[0].year}-{cum.index[-1].year}"
+    title = f"{factor_name}: Quintile Backtest, {years}"
+
+    fig, (ax_cum, ax_ic) = plt.subplots(
+        nrows=2, ncols=1, figsize=(11, 8), height_ratios=[3, 1.4], sharex=True
+    )
+
+    ax_cum.plot(
+        cum.index, cum[bottom_q], color="firebrick",
+        label=f"{bottom_q} - Lowest {factor_name} (losers)",
+    )
+    ax_cum.plot(
+        cum.index, cum[top_q], color="forestgreen",
+        label=f"{top_q} - Highest {factor_name} (winners)",
+    )
+    ax_cum.plot(
+        cum.index, cum["Q5_minus_Q1"], color="steelblue",
+        label=f"{top_q} - {bottom_q} long-short spread",
+    )
+    ax_cum.axhline(1.0, color="gray", linestyle="--", linewidth=0.8)
+    ax_cum.set_ylabel("Cumulative Growth of $1")
+    ax_cum.legend(loc="upper left")
+
+    full_title = title if subtitle is None else f"{title}\n{subtitle}"
+    ax_cum.set_title(full_title, fontsize=13, fontweight="bold")
+
+    stats_line = (
+        f"IC (mean): {result.ic_mean:.3f}   |   IR: {result.information_ratio:.3f}"
+        f"   |   Q5-Q1 Sharpe: {result.sharpe_ratio:.2f}"
+        f"   |   Q5-Q1 Max DD: {result.max_drawdown:.1%}"
+    )
+    ax_ic.set_title(stats_line, fontsize=10, style="italic", color="dimgray")
+
+    ic = result.ic_series
+    colors = ["forestgreen" if v >= 0 else "indianred" for v in ic.values]
+    ax_ic.bar(ic.index, ic.values, color=colors, width=20)
+    ax_ic.axhline(0.0, color="black", linewidth=0.8)
+    ax_ic.set_ylabel("Information\nCoefficient")
+    ax_ic.set_xlabel("Date")
+
+    fig.autofmt_xdate()
+    fig.tight_layout()
+
+    if save_path:
+        fig.savefig(save_path, dpi=150)
+        logger.info("Saved factor summary plot to %s", save_path)
+
+    return fig
+
+
 def summarize_backtest(result: BacktestResult) -> str:
     """Produce a human-readable text summary of a `BacktestResult`.
 

@@ -65,8 +65,20 @@ Step 5 recommendation ("run a backtest before drawing conclusions").
      decline in cumulative returns — a measure of the worst-case loss an investor in
      this strategy would have experienced).
 
-4. **Plot** Q1 vs Q5 (and optionally the Q5−Q1 spread) cumulative return curves using
-   `backtest.py::plot_quintile_returns()`, saving to a PNG the user can view.
+4. **Plot** the results using `backtest.py::plot_factor_summary()`, saving to a PNG the
+   user can view. This produces a two-panel chart:
+   - **Top panel**: cumulative growth of $1 for the bottom quintile (red, "losers"),
+     top quintile (green, "winners"), and the Q5−Q1 long-short spread (blue), with a
+     title naming the factor and date range, an optional subtitle describing the
+     universe/rebalance frequency, and a stats line showing IC mean, IR, Sharpe, and
+     Max DD.
+   - **Bottom panel**: a bar chart of the per-period Information Coefficient, colored
+     green (IC > 0, factor ranked correctly that period) or red (IC < 0) — this shows
+     at a glance how *consistent* the factor's predictive power was, complementing the
+     single IR number.
+
+   Pass a descriptive `factor_name` (e.g., "12-1 Month Momentum") and `subtitle` (e.g.,
+   "15-stock mega-cap universe, monthly rebalance") so the chart is self-explanatory.
 
 5. **Report results** in a table:
 
