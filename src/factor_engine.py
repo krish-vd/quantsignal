@@ -49,7 +49,10 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from .utils import safe_divide
+try:
+    from .utils import safe_divide
+except ImportError:  # pragma: no cover - fallback when run without package context
+    from utils import safe_divide
 
 logger = logging.getLogger(__name__)
 

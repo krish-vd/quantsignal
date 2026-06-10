@@ -88,6 +88,20 @@ source .venv/bin/activate          # on Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+> **macOS note**: if `python -m venv .venv` hangs or crashes while
+> bootstrapping pip (common with the Python 3.9 that ships with Xcode
+> Command Line Tools), skip the venv and use `conda` instead:
+>
+> ```bash
+> conda create -n quantsignal python=3.11 -y
+> conda activate quantsignal
+> pip install -r requirements.txt
+> ```
+>
+> Or, if you already have a conda `(base)` environment active, you can
+> simply run `pip install -r requirements.txt` directly without creating a
+> venv at all.
+
 Then install the plugin into Claude (refer to your Claude Code / plugin
 host's documentation for loading a local plugin directory).
 
